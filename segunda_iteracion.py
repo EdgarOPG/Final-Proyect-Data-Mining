@@ -30,7 +30,7 @@ def get_feacture_subset(data, *args):
 
 def attribute_subset_selection_with_trees(data):
     # import data
-    X = data[:,1:-1]
+    X = data[:,0:-1]
     Y = numpy.asarray(data[:,-1], dtype="int16")
 
     # First 10 rows
@@ -62,7 +62,7 @@ def attribute_subset_selection_with_trees(data):
 
 def principal_components_analysis(data, columns, n_components):
     # import data
-    X = data[:,1:-1]
+    X = data[:,0:-1]
     Y = numpy.asarray(data[:,-1], dtype="int16")
 
     # First 10 rows
@@ -100,7 +100,7 @@ def principal_components_analysis(data, columns, n_components):
 def z_score_normalization(data):
     print('----- z_score_normalization -------\n')
     # import data
-    X = data[:,1:-1]
+    X = data[:,0:-1]
     Y = numpy.asarray(data[:,-1], dtype="int16")
 
     # First 10 rows
@@ -120,7 +120,7 @@ def z_score_normalization(data):
 def min_max_scaler(data):
     print('----- min_max_scaler -------\n')
     # import data
-    X = data[:,1:-1]
+    X = data[:,0:-1]
     Y = numpy.asarray(data[:,-1], dtype="int16")
 
     # First 10 rows
@@ -196,8 +196,8 @@ if __name__ == '__main__':
     data = z_score_normalization(data)
     #min_max_scaler(data)
 
-    #attribute_subset_selection_with_trees(data)
-    principal_components_analysis(data,columns,.80)
+    attribute_subset_selection_with_trees(data)
+    #principal_components_analysis(data,columns,77)
 
     feature_vector = data[:,1:-1]
     targets = data[:,-1]
@@ -211,9 +211,10 @@ if __name__ == '__main__':
     """
     Parameters to select:
     criterion: "mse"
-    max_depth: maximum depth of tree, default: None
+    max_depth: maximum depth of tree, default: None,
+    random_state: 0
     """
-    dec_tree_reg = DecisionTreeRegressor(criterion='mse', max_depth=7)
+    dec_tree_reg = DecisionTreeRegressor(criterion='mse', max_depth=9, random_state=0)
     dec_tree_reg.fit(data_features_train, data_targets_train)
 
     # Model evaluation
