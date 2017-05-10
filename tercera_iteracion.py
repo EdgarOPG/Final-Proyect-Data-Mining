@@ -22,10 +22,10 @@ def get_feacture_subset(data, *args):
     subset = data[featureDic]
     return subset
 
-def attribute_subset_selection_with_trees(data):
+def attribute_subset_selection_with_trees(feature_vector, targets):
     # import data
-    X = data[:,0:-1]
-    Y = numpy.asarray(data[:,-1], dtype="int16")
+    X = feature_vector
+    Y = targets
 
     # First 10 rows
     print('Training Data:\n\n' + str(X[:20]))
@@ -54,10 +54,12 @@ def attribute_subset_selection_with_trees(data):
     print('\nNew feature vector:\n')
     print(new_feature_vector[:10])
 
-def principal_components_analysis(data, columns, n_components):
+    return new_feature_vector
+
+def principal_components_analysis(feature_vector, targets, n_components):
     # import data
-    X = data[:,0:-1]
-    Y = numpy.asarray(data[:,-1], dtype="int16")
+    X = feature_vector
+    Y = targets
 
     # First 10 rows
     print('Training Data:\n\n' + str(X[:10]))
@@ -78,10 +80,11 @@ def principal_components_analysis(data, columns, n_components):
 
     # Model information:
     print('\nModel information:\n')
-    print('Number of components elected: ' + str(pca.n_components))
-    print('New feature dimension: ' + str(pca.n_components_))
-    print('Variance of every feature:   \n' + str(pca.explained_variance_ratio_))
+    print('Number of components elected:\n' + str(pca.n_components))
+    print('New feature dimension:\n' + str(pca.n_components_))
+    print('Variance of every feature:\n' + str(pca.explained_variance_ratio_))
 
+    return new_feature_vector
     # First 10 rows of new feature vector
     #print('\nNew feature vector:\n')
     #print(new_feature_vector[:10])
@@ -138,6 +141,8 @@ def min_max_scaler(data):
     print('\nNew feature vector:\n')
     print(new_feature_vector[:10])
 
+    return new_feature_vector
+
 def fill_missing_values_with_constant(data, column, constant):
     temp = data[column].fillna(constant)
     data[column] = temp
@@ -172,6 +177,7 @@ def save(data):
 if __name__ == '__main__':
 
     data = pd.read_csv('train.csv')
+
     data['LotFrontage'] = data['LotFrontage'].replace('NaN', -1, regex=False)
 
     #Outlier
@@ -182,19 +188,18 @@ if __name__ == '__main__':
 
     data = data.fillna('NaN')
 
-    columns = data.columns
-    #print(columns)
+    #Targets
+    targets = data['SalePrice']
 
-    data = convert_data_to_numeric(data)
+    feature_vector = convert_data_to_numeric(data)
 
-    data = z_score_normalization(data)
-    #min_max_scaler(data)
+    feature_vector = feature_vector[:,1:-1]
 
-    attribute_subset_selection_with_trees(data)
-    #principal_components_analysis(data,columns,.9)
+    #feature_vector = z_score_normalization(feature_vector)
+    feature_vector = min_max_scaler(feature_vector)
 
-    feature_vector = data[:,1:-1]
-    targets = data[:,-1]
+    feature_vector = attribute_subset_selection_with_trees(feature_vector, targets)
+    #feature_vector = principal_components_analysis(feature_vector, targets,.9)
 
     data_features_train, data_features_test, data_targets_train, data_targets_test = \
         train_test_split(feature_vector,
@@ -207,7 +212,7 @@ if __name__ == '__main__':
     criterion: "mse"
     max_depth: maximum depth of tree, default: None
     """
-    dec_tree_reg = DecisionTreeRegressor(criterion='mse', max_depth=7)
+    dec_tree_reg = DecisionTreeRegressor(criterion='mse', max_depth=7, random_state= 1)
     dec_tree_reg.fit(data_features_train, data_targets_train)
 
     # Model evaluation
